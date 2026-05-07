@@ -50,30 +50,11 @@ constexpr struct olv_allowlist new_entry = {
     .path = "",
     .flags = {1, 1, 1, 1, 1},
 };
-
-const unsigned char miiverse_green_highlight[] = {
-        0x82, 0xff, 0x05, 0xff, 0x82, 0xff, 0x05, 0xff, 0x1d, 0xff, 0x04, 0xff, 0x1d, 0xff, 0x04, 0xff
-};
-const unsigned char juxt_purple_highlight[] = {
-        0x5d, 0x4a, 0x9a, 0xff, 0x5d, 0x4a, 0x9a, 0xff, 0x5d, 0x4a, 0x9a, 0xff, 0x5d, 0x4a, 0x9a, 0xff
-};
-const unsigned char miiverse_green_touch1[] = {
-        0x94, 0xd9, 0x2a, 0x00, 0x57, 0xbd, 0x12, 0xff
-};
-const unsigned char juxt_purple_touch1[] = {
-        0x5d, 0x4a, 0x9a, 0x00, 0x5d, 0x4a, 0x9a, 0xff
-};
-const unsigned char miiverse_green_touch2[] = {
-        0x57, 0xbd, 0x12, 0x00, 0x94, 0xd9, 0x2a, 0xff
-};
-const unsigned char juxt_purple_touch2[] = {
-        0x5d, 0x4a, 0x9a, 0x00, 0x5d, 0x4a, 0x9a, 0xff
-};
-
-const replacement replacements[] = {
-        {miiverse_green_highlight, juxt_purple_highlight},
-        {miiverse_green_touch1,    juxt_purple_touch1},
-        {miiverse_green_touch2,    juxt_purple_touch2},
+constexpr struct olv_allowlist roseverse_entry = {
+    .scheme = "https",
+    .domain = ".projectrose.cafe",
+    .path = "",
+    .flags = {1, 1, 1, 1, 1},
 };
 
 static std::optional<FSFileHandle> rootca_pem_handle{};
@@ -97,9 +78,14 @@ DECL_FUNCTION(int, FSOpenFile, FSClient *client, FSCmdBlock *block, char *path, 
 
         auto olv_ok = setup_olv_libs();
         // Patch applet binary too
-        if (olv_ok)
-            replace(0x10000000, 0x10000000, (const char *)&original_entry, sizeof(original_entry), (const char *)&new_entry, sizeof(new_entry));
-        // Check for root CA file and take note of its handle
+        if (olv_ok) }
+            if (Config::connect_to_roseverse) {
+                replace(0x10000000, 0x10000000, (const char *)&original_entry, sizeof(original_entry), (const char *)&roseverse_entry, sizeof(roseverse_entry));
+            } else {
+                replace(0x10000000, 0x10000000, (const char *)&original_entry, sizeof(original_entry), (const char *)&new_entry, sizeof(new_entry));
+            }
+        }    
+    // Check for root CA file and take note of its handle
     } else if (strcmp("vol/content/browser/rootca.pem", path) == 0) {
         int ret = real_FSOpenFile(client, block, path, mode, handle, error);
         rootca_pem_handle = *handle;
@@ -121,7 +107,7 @@ DECL_FUNCTION(FSStatus, FSReadFile, FSClient *client, FSCmdBlock *block, uint8_t
 
         //this can't be done above (in the FSOpenFile hook) since it's not loaded yet.
         //the hardcoded offsets suck but they really are at Random Places In The Heap
-        replaceBulk(0x11000000, 0x02000000, replacements);
+        //  uhh idk c so the strlcpy might be needed??   replaceBulk(0x11000000, 0x02000000, replacements);
         return (FSStatus) count;
     }
 
