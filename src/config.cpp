@@ -19,6 +19,7 @@
 
 bool Config::connect_to_network = false;
 bool Config::connect_to_reeshop = false;
+bool Config::connect_to_roseverse = false;
 bool Config::initialized = false;
 bool Config::shown_warning = false;
 bool Config::plugin_is_loaded = false;
