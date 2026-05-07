@@ -58,8 +58,11 @@ void new_rpl_loaded(OSDynLoad_Module module, void* ctx, OSDynLoad_NotifyReason r
     // Loaded olv?
     if (reason != OS_DYNLOAD_NOTIFY_LOADED) return;
     if (!rpl->name || !path_is_olv(rpl->name)) return;
-
-    replace(rpl->dataAddr, rpl->dataSize, original_url, sizeof(original_url), new_url, sizeof(new_url));
+    if (Config::connect_to_roseverse) {
+        replace(rpl->dataAddr, rpl->dataSize, original_url, sizeof(original_url), roseverse_url, sizeof(roseverse_url));
+    } else {
+        replace(rpl->dataAddr, rpl->dataSize, original_url, sizeof(original_url), new_url, sizeof(new_url));
+    }
 }
 
 bool setup_olv_libs() {
@@ -82,6 +85,9 @@ bool setup_olv_libs() {
         DEBUG_FUNCTION_LINE("Inkay: OSGetMemBound failed!");
         return false;
     }
-
-    return replace(base_addr, size, original_url, sizeof(original_url), new_url, sizeof(new_url));
+    if (Config::connect_to_roseverse) {
+        return replace(base_addr, size, original_url, sizeof(original_url), roseverse_url, sizeof(roseverse_url));
+    } else {
+        return replace(base_addr, size, original_url, sizeof(original_url), new_url, sizeof(new_url));
+    }
 }
