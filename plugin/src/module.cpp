@@ -24,7 +24,7 @@
 #include <coreinit/dynload.h>
 
 static OSDynLoad_Module module;
-static void (*moduleInitialize)(bool,bool) = nullptr;
+static void (*moduleInitialize)(bool,bool,bool) = nullptr;
 static InkayStatus (*moduleGetStatus)() = nullptr;
 static void (*moduleSetPluginRunning)() = nullptr;
 
