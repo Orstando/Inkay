@@ -5,6 +5,7 @@
 > [!important]
 > this version of inkay lets you connect to pretendo/reeshop/roseverse
 > sorry for my bad code+commit messages, i did this quick and also have absolutely no idea how to code in C/C++
+> -orstando
 
 > [!important]
 > I feel like I need to put this here, so here it is.
