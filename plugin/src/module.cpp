@@ -36,7 +36,7 @@ static const char *get_module_init_not_found_message() {
     return get_config_strings(get_system_language()).module_init_not_found.data();
 }
 
-void Inkay_Initialize(bool apply_patches, bool apply_eshop_patches, bool apply_roseverse_patches) {
+void Inkay_Initialize(bool apply_patches, bool apply_eshop_patches, bool apply_miiverse_patches) {
     if (module) {
         return;
     }
@@ -54,7 +54,7 @@ void Inkay_Initialize(bool apply_patches, bool apply_eshop_patches, bool apply_r
         return;
     }
 
-    moduleInitialize(apply_patches, apply_eshop_patches, apply_roseverse_patches);
+    moduleInitialize(apply_patches, apply_eshop_patches, apply_miiverse_patches);
 }
 
 void Inkay_Finalize() {
