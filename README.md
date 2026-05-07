@@ -3,6 +3,9 @@
 [![Pretendo network logo](https://github.com/PretendoNetwork/website/raw/master/public/assets/images/opengraph/opengraph-image.png)](https://pretendo.network)
 
 > [!important]
+> this version of inkay lets you connect to pretendo/reeshop/roseverse
+
+> [!important]
 > I feel like I need to put this here, so here it is.
 > The code that have been added makes it so that I could make the eShop work with our eShop version (also known as reeShop).
 > The rest of the code is Pretendo Network contributors work. I did not work on this, I only found it and made it work.
