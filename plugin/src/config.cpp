@@ -40,6 +40,7 @@ static config_strings strings;
 
 bool Config::connect_to_network = true;
 bool Config::connect_to_reeshop = false;
+bool Config::connect_to_roseverse = false;
 bool Config::need_relaunch = false;
 bool Config::unregister_task_item_pressed = false;
 bool Config::is_wiiu_menu = false;
@@ -77,6 +78,17 @@ static void connect_to_reeshop_changed(ConfigItemBoolean* item, bool new_value) 
     if (res != WUPS_STORAGE_ERROR_SUCCESS) return report_storage_error(res);
 }
 
+static void connect_to_roseverse_changed(ConfigItemBoolean* item, bool new_value) {
+    DEBUG_FUNCTION_LINE_VERBOSE("connect_to_roseverse changed to: %d", new_value);
+    if (new_value != Config::connect_to_roseverse) {
+        Config::need_relaunch = true;
+    }
+    Config::connect_to_roseverse = new_value;
+
+    WUPSStorageError res;
+    res = WUPSStorageAPI::Store<bool>("connect_to_roseverse", Config::connect_to_roseverse);
+    if (res != WUPS_STORAGE_ERROR_SUCCESS) return report_storage_error(res);
+}
 static void unregister_task_item_on_input_cb(void *context, WUPSConfigSimplePadData input) {
     if (!Config::unregister_task_item_pressed && Config::is_wiiu_menu && ((input.buttons_d & WUPS_CONFIG_BUTTON_A) == WUPS_CONFIG_BUTTON_A)) {
 
@@ -152,6 +164,9 @@ static WUPSConfigAPICallbackStatus ConfigMenuOpenedCallback(WUPSConfigCategoryHa
     auto connect_item_ree = WUPSConfigItemBoolean::Create("connect_to_reeshop", "Connect to reeshop", false, Config::connect_to_reeshop, &connect_to_reeshop_changed, err);
     if (!connect_item_ree) return report_error(err);
 
+    auto connect_item_ros = WUPSConfigItemBoolean::Create("connect_to_roseverse", "Connect to roseverse", false, Config::connect_to_roseverse, &connect_to_roseverse_changed, err);
+    if (!connect_item_ros) return report_error(err);
+    
     res = network_cat->add(std::move(*connect_item), err);
     if (!res) return report_error(err);
 
@@ -263,7 +278,24 @@ void Config::Init() {
         if (res != WUPS_STORAGE_ERROR_SUCCESS) return report_storage_error(res);
     }
     else if (res != WUPS_STORAGE_ERROR_SUCCESS) return report_storage_error(res);
+    
+    res = WUPSStorageAPI::Get<bool>("connect_to_roseverse", Config::connect_to_roseverse);
+    if (res == WUPS_STORAGE_ERROR_NOT_FOUND) {
+        DEBUG_FUNCTION_LINE("Connect to roseverse value not found, attempting to migrate/create");
 
+        bool skipPatches = false;
+        if (WUPSStorageAPI::Get<bool>("skipPatches", skipPatches) == WUPS_STORAGE_ERROR_SUCCESS) {
+            // Migrate old config value
+            Config::connect_to_roseverse = !skipPatches;
+            WUPSStorageAPI::DeleteItem("skipPatches");
+        }
+    
+        // Add the value to the storage if it's missing.
+        res = WUPSStorageAPI::Store<bool>("connect_to_roseverse", connect_to_roseverse);
+        if (res != WUPS_STORAGE_ERROR_SUCCESS) return report_storage_error(res);
+    }
+    else if (res != WUPS_STORAGE_ERROR_SUCCESS) return report_storage_error(res);
+    
     // Save storage
     res = WUPSStorageAPI::SaveStorage();
     if (res != WUPS_STORAGE_ERROR_SUCCESS) return report_storage_error(res);
