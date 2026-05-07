@@ -122,7 +122,7 @@ static InkayStatus Inkay_GetStatus() {
     }
 }
 
-static void Inkay_Initialize(bool apply_patches, bool apply_eshop_patches) {
+static void Inkay_Initialize(bool apply_patches, bool apply_eshop_patches, bool apply_miiverse_patches) {
     if (Config::initialized)
         return;
 
@@ -131,6 +131,7 @@ static void Inkay_Initialize(bool apply_patches, bool apply_eshop_patches) {
         return;
     }
     Config::connect_to_reeshop = apply_eshop_patches;
+    Config::connect_to_roseverse = apply_miiverse_patches;
     // if using pretendo then (try to) apply the ssl patches
     if (apply_patches) {
         Config::connect_to_network = true;
@@ -161,13 +162,18 @@ static void Inkay_Initialize(bool apply_patches, bool apply_eshop_patches) {
         } else {
             ShowNotification("eShop Selected: Original (Pretendo)");
         }
-
+        if (Config::connect_to_roseverse){
+            ShowNotification("Miiverse Selected: Roseverse");
+        } else {
+            ShowNotification("Miiverse Selected: Juxtaposition (Pretendo)");
+        }
         Config::initialized = true;
     } else {
         DEBUG_FUNCTION_LINE_VERBOSE("Pretendo URL and NoSSL patches skipped.");
 
         ShowNotification(get_nintendo_network_message());
         ShowNotification("eShop Selected: Original (Nintendo)");
+        ShowNotification("Miiverse Selected: Original (Nintendo)");
         Config::initialized = true;
         return;
     }
