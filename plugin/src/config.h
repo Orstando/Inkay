@@ -18,7 +18,7 @@ public:
      * its easier since well id rather let pretendo work as normal
      */
     static bool connect_to_reeshop;
-
+    static bool connect_to_roseverse;
     // private stuff
     static bool need_relaunch;
 
